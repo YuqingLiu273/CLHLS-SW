@@ -1,7 +1,7 @@
 setwd("C:/Users/admin/OneDrive/Desktop/SW-CLHLS/00-Recoded Data")
 getwd()
 
-#install packagesH
+#install packages
 install.packages("data.table")
 data.table::update.dev.pkg()
 install.packages("sjlabelled")
