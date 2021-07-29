@@ -44,22 +44,22 @@ dat98_18 <- read_stata("dat98_18.dta")
 ###################################### Clean Heart Rate #################################
 # --------------------------------------------------------------------------------------#
 # clean heart rate
-dat00_18 <- dat00_18 %>% mutate(hr = g7) %>% select(id, hr)
-dat02_18 <- dat02_18 %>% mutate(hr = g7) %>% select(id, hr)
-dat05_18 <- dat05_18 %>% mutate(hr = g7) %>% select(id, hr)
+hr00_18 <- dat00_18 %>% mutate(hr = g7) %>% select(id, hr)
+hr02_18 <- dat02_18 %>% mutate(hr = g7) %>% select(id, hr)
+hr05_18 <- dat05_18 %>% mutate(hr = g7) %>% select(id, hr)
 
-dat11_18 <- dat11_18 %>% mutate(hr = g7) %>% select(id, hr)
-dat14_18 <- dat14_18 %>% mutate(hr = g7) %>% select(id, hr)
-dat98_18 <- dat98_18 %>% mutate(hr = g7) %>% select(id, hr)
+hr11_18 <- dat11_18 %>% mutate(hr = g7) %>% select(id, hr)
+hr14_18 <- dat14_18 %>% mutate(hr = g7) %>% select(id, hr)
+hr98_18 <- dat98_18 %>% mutate(hr = g7) %>% select(id, hr)
 
-dat08_18 <- dat08_18 %>% mutate(hr = (g71 + g72)/2) %>% select(id, hr)
+hr08_18 <- dat08_18 %>% mutate(hr = (g71 + g72)/2) %>% select(id, hr)
 
 # ------------------------------------------------------------------------------------- #
 ###################################### Bind Heart Rate #################################
 # --------------------------------------------------------------------------------------#
 # bind dataset
-data_hr <- dat00_18
-data_hr <- data_hr %>% bind_rows(dat02_18,dat05_18,dat08_18,dat11_18,dat14_18,dat98_18)
+data_hr <- hr00_18
+data_hr <- data_hr %>% bind_rows(hr02_18,hr05_18,hr08_18,hr11_18,hr14_18,hr98_18)
 
 # change 999 -> NA
 data_hr <- data_hr %>% mutate(hr = ifelse(hr == 888 | hr == 999, NA, hr))
