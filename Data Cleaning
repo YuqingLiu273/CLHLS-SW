@@ -27,6 +27,7 @@ require(sjlabelled)
 require(survival)
 require(survminer)
 require(ggplot2)
+require(dplyr)
 
 
 #Read data from STATA file
