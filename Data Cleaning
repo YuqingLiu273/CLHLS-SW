@@ -37,7 +37,7 @@ dat02_18 <- read_stata("dat02_18.dta")
 dat05_18 <- read_stata("dat05_18.dta")
 dat08_18 <- read_stata("dat08_18.dta")
 dat11_18 <- read_stata("dat11_18.dta")
-dat14_18 <- read_stata("dat14_18.dta")
+dat14_18 <- read_stata("dat14_18_1125.dta")
 dat98_18 <- read_stata("dat98_18.dta")
 
 # ------------------------------------------------------------------------------------- #
@@ -83,9 +83,9 @@ data_hr <- hr08_18 %>%
 # ------------------------------------------------------------------------------------- #
 ###################################### Clean Weight #################################
 # --------------------------------------------------------------------------------------#
-dat08_18 <- read_stata("C:/Users/admin/OneDrive/Desktop/Recoded Data/dat08_18.dta")
-dat11_18 <- read_stata("C:/Users/admin/OneDrive/Desktop/Recoded Data/dat11_18.dta")
-dat14_18 <- read_stata("C:/Users/admin/OneDrive/Desktop/Recoded Data/dat14_18.dta")
+dat08_18 <- read_stata("dat08_18.dta")
+dat11_18 <- read_stata("dat11_18.dta")
+dat14_18 <- read_stata("dat14_18_1125.dta")
 
 wgt08_18 <- dat08_18 %>%
   mutate(weight = g101) %>%
@@ -105,7 +105,7 @@ wgt14_18 <- dat14_18 %>%
 # --------------------------------------------------------------------------------------#
 dat08_18 <- read_stata("dat08_18.dta")
 dat11_18 <- read_stata("dat11_18.dta")
-dat14_18 <- read_stata("dat14_18.dta")
+dat14_18 <- read_stata("dat14_18_1125.dta")
 
 hgt08_18 <- dat08_18 %>%
   mutate(height = g1021) %>%
