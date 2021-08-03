@@ -120,13 +120,19 @@ hgt14_18 <- dat14_18 %>%
   select(id, height)
 
 # ------------------------------------------------------------------------------------- #
-###################################### Bind dataset #####################################
+###################################### Bind Weight #####################################
 # --------------------------------------------------------------------------------------#
 #
 # bind weight
 data_wgt <- wgt08_18 %>%
   bind_rows(wgt11_18,wgt14_18)
-
+  
+# ------------------------------------------------------------------------------------- #
+###################################### Find Outliers for Weight #########################
+# --------------------------------------------------------------------------------------#
+#
+outliers = boxplot(data_wgt$weight, plot=FALSE)$out
+out_wgt <- data_wgt[data_wgt$weight %in% outliers,]
 
 # drop abnormal values of weight 
 data_wgt <- data_wgt %>% mutate(weight = ifelse(weight < 30, NA, weight)) %>% filter(is.na(weight) == FALSE)
@@ -138,10 +144,19 @@ hist(data_wgt$weight)
 # Boxplot of weight
 boxplot(data_wgt$weight, main="boxplot of weight", ylab="weight", col=c("coral1"))
 
-
+# ------------------------------------------------------------------------------------- #
+###################################### Bind Height #####################################
+# --------------------------------------------------------------------------------------#
 # bind height
 data_hgt <- hgt08_18 %>% bind_rows(hgt11_18,hgt14_18)
 
+
+# ------------------------------------------------------------------------------------- #
+###################################### Find Outliers for Height #########################
+# --------------------------------------------------------------------------------------#
+#
+outliers = boxplot(data_hgt$height, plot=FALSE)$out
+out_hgt <- data_hgt[data_hgt$height %in% outliers,]
 
 # drop abnormal values of height
 data_hgt <- data_hgt %>% mutate(height = ifelse(height < 100, NA, height)) %>% filter(is.na(height) == FALSE)
