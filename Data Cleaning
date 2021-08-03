@@ -133,14 +133,22 @@ hgt14_18 <- dat14_18 %>%
 data_wgt <- wgt08_18 %>%
   bind_rows(wgt11_18,wgt14_18)
 
-# drop abnormal values of weight ??ʱ?ų?????С??20
-data_wgt <- data_wgt %>% mutate(weight = ifelse(weight <= 20, NA, weight)) %>% filter(is.na(weight) == FALSE)
-summary(data_wgt$weight)
-hist(data_wgt$weight)
+# Boxplot of weight
+boxplot(data_wgt$weight, main="boxplot of weight", ylab="weight",
+        col=c("coral1"))
 
 # bind height
 data_hgt <- hgt08_18 %>%
   bind_rows(hgt11_18,hgt14_18)
+
+# Boxplot of height
+boxplot(data_hgt$height, main="boxplot of height", ylab="height",
+        col=c("coral1"))
+
+# drop abnormal values of weight ??ʱ?ų?????С??20
+data_wgt <- data_wgt %>% mutate(weight = ifelse(weight <= 20, NA, weight)) %>% filter(is.na(weight) == FALSE)
+summary(data_wgt$weight)
+hist(data_wgt$weight)
 
 # drop abnormal values of height ??ʱ?ų?????С??50
 data_hgt <- data_hgt %>% mutate(height = ifelse(height <= 50, NA, height)) %>% filter(is.na(height) == FALSE)
