@@ -127,18 +127,35 @@ hgt14_18 <- dat14_18 %>%
 data_wgt <- wgt08_18 %>%
   bind_rows(wgt11_18,wgt14_18)
 
+
+# drop abnormal values of weight 
+data_wgt <- data_wgt %>% mutate(weight = ifelse(weight < 30, NA, weight)) %>% filter(is.na(weight) == FALSE)
+data_wgt <- data_wgt %>% mutate(weight = ifelse(weight > 200, NA, weight)) %>% filter(is.na(weight) == FALSE)
+summary(data_wgt$weight)
+hist(data_wgt$weight)
+
+
+# Boxplot of weight
+boxplot(data_wgt$weight, main="boxplot of weight", ylab="weight", col=c("coral1"))
+
+
+# bind height
+data_hgt <- hgt08_18 %>% bind_rows(hgt11_18,hgt14_18)
+
+
+# drop abnormal values of height
+data_hgt <- data_hgt %>% mutate(height = ifelse(height < 100, NA, height)) %>% filter(is.na(height) == FALSE)
+
+
+# Boxplot of height
+boxplot(data_hgt$height, main="boxplot of height", ylab="height",col=c("coral1"))
+
+
 # drop abnormal values of weight 
 data_wgt <- data_wgt %>% mutate(weight = ifelse(weight <= 20, NA, weight)) %>% filter(is.na(weight) == FALSE)
 summary(data_wgt$weight)
 hist(data_wgt$weight)
 
-# bind height
-data_hgt <- hgt08_18 %>%
-  bind_rows(hgt11_18,hgt14_18)
-
-# drop abnormal values of height
-data_hgt <- data_hgt %>% mutate(height = ifelse(height < 100, NA, height)) %>% filter(is.na(height) == FALSE)
-summary(data_hgt$height)
 
 # calculate bmi
 data_bmi<-left_join(data_hgt, data_wgt,by = "id") %>%
@@ -163,8 +180,8 @@ data <- data_bmihr %>% full_join(data_bmihr, by = "id")
 data_bmihr <- data_bmihr %>% mutate(bmihr = ifelse(hr >= 200, NA, bmihr)) %>% filter(is.na(bmihr) == FALSE)
 
 ## drop Obs with problematic bmi
-data_bmihr <- data_bmihr %>% mutate(bmihr = ifelse(bmi >= 100, NA, bmihr)) %>% filter(is.na(bmihr) == FALSE)
-##*** Hi jiayi and Liang, we need a standard for droping prolematic bmi or we could take a look at each individual with problematic bmi value.
+data_bmihr <- data_bmihr %>% mutate(bmihr = ifelse(bmi > 60, NA, bmihr)) %>% filter(is.na(bmihr) == FALSE)
+data_bmihr <- data_bmihr %>% mutate(bmihr = ifelse(bmi < 10, NA, bmihr)) %>% filter(is.na(bmihr) == FALSE)
 summary(data_bmihr$bmi)
 
 
