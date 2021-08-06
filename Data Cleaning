@@ -104,19 +104,16 @@ wgt14_18 <- dat14_18 %>%
 hgt08_18 <- dat08_18 %>%
   mutate(height = g1021) %>%
   mutate(height = ifelse(height == 888 | height == 999, NA, height)) %>%
-  mutate_at(vars(height), funs(setattr(., "label", "directly measured height of the interviewee"))) %>%
   select(id, height)
 
 hgt11_18 <- dat11_18 %>%
   mutate(height = g1021) %>%
   mutate(height = ifelse(height == 888 | height == 999, NA, height)) %>%
-  mutate_at(vars(height), funs(setattr(., "label", "directly measured height of the interviewee"))) %>%
   select(id, height)
 
 hgt14_18 <- dat14_18 %>%
   mutate(height = g1021) %>%
   mutate(height = ifelse(height == 888 | height == 999, NA, height)) %>%
-  mutate_at(vars(height), funs(setattr(., "label", "directly measured height of the interviewee"))) %>%
   select(id, height)
 
 # ------------------------------------------------------------------------------------- #
@@ -126,7 +123,7 @@ hgt14_18 <- dat14_18 %>%
 # bind weight
 data_wgt <- wgt08_18 %>%
   bind_rows(wgt11_18,wgt14_18)
-  
+
 # ------------------------------------------------------------------------------------- #
 ###################################### Find Outliers for Weight #########################
 # --------------------------------------------------------------------------------------#
@@ -202,10 +199,10 @@ summary(data_bmihr$bmi)
 
 summary(data_bmihr$bmihr)
 data_bmihr <- data_bmihr %>% mutate(bmihr_quartile = case_when(bmihr <= 1236.3 ~ "Q1",
-                                                   1236.3 < bmihr & bmihr <= 1427.3 ~ "Q2",
-                                                   1427.3 < bmihr & bmihr <= 1655.6 ~ "Q3",
-                                                   bmihr > 1655.6 ~ "Q4")) %>%
-mutate(bmihr_quartile = factor(bmihr_quartile, levels = c("Q1", "Q2", "Q3", "Q4")))
+                                                               1236.3 < bmihr & bmihr <= 1427.3 ~ "Q2",
+                                                               1427.3 < bmihr & bmihr <= 1655.6 ~ "Q3",
+                                                               bmihr > 1655.6 ~ "Q4")) %>%
+  mutate(bmihr_quartile = factor(bmihr_quartile, levels = c("Q1", "Q2", "Q3", "Q4")))
 
 ## the value of Q1 Q2 Q3 is still suspended until we fix the stardard for excluding the problematic bmi value
 
