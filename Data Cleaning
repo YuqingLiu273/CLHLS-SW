@@ -32,25 +32,19 @@ require(dplyr)
 
 #Read data from STATA file
 library(haven)
-dat00_18 <- read_stata("dat00_18.dta")
-dat02_18 <- read_stata("dat02_18.dta")
-dat05_18 <- read_stata("dat05_18.dta")
+
 dat08_18 <- read_stata("dat08_18.dta")
 dat11_18 <- read_stata("dat11_18.dta")
 dat14_18 <- read_stata("dat14_18_1125.dta")
-dat98_18 <- read_stata("dat98_18.dta")
+
 
 # ------------------------------------------------------------------------------------- #
 ###################################### Clean Heart Rate #################################
 # --------------------------------------------------------------------------------------#
 # clean heart rate
-hr00_18 <- dat00_18 %>% mutate(hr = g7) %>% select(id, hr)
-hr02_18 <- dat02_18 %>% mutate(hr = g7) %>% select(id, hr)
-hr05_18 <- dat05_18 %>% mutate(hr = g7) %>% select(id, hr)
 
 hr11_18 <- dat11_18 %>% mutate(hr = g7) %>% select(id, hr)
 hr14_18 <- dat14_18 %>% mutate(hr = g7) %>% select(id, hr)
-hr98_18 <- dat98_18 %>% mutate(hr = g7) %>% select(id, hr)
 
 hr08_18 <- dat08_18 %>% mutate(hr = (g71 + g72)/2) %>% select(id, hr)
 
@@ -58,28 +52,13 @@ hr08_18 <- dat08_18 %>% mutate(hr = (g71 + g72)/2) %>% select(id, hr)
 ###################################### Bind Heart Rate #################################
 # --------------------------------------------------------------------------------------#
 # bind dataset
-data_hr <- hr00_18
-data_hr <- data_hr %>% bind_rows(hr02_18,hr05_18,hr08_18,hr11_18,hr14_18,hr98_18)
+data_hr <- hr08_18
+data_hr <- data_hr %>% bind_rows(hr11_18,hr14_18)
 
 # change 999 -> NA
 data_hr <- data_hr %>% mutate(hr = ifelse(hr == 888 | hr == 999, NA, hr))
 
-# Other steps (skip these now!!)
 
-# merge with else data
-data <- readRDS("F:/Box Sync/Archives2020LLY/Zhengting/Duke Kunshan University Intern (zh133@duke.edu)/4 healthy aging-CLHLS/P06 Healthy lifestyle/formal analysis by ZH/cleaned data/lifesty_ana18_non_repeated.rds")
-data <- data %>% full_join(data_hr, by = "id")
-data <- data %>% mutate(bmihr = bmi * hr) %>% filter(is.na(bmihr) == FALSE)
-
-# merge with survival time and status
-data_surtime <- read_dta("F:/Box Sync/Archives2020LLY/Zhengting/Duke Kunshan University Intern (zh133@duke.edu)/4 healthy aging-CLHLS/P06 Healthy lifestyle/formal analysis by ZH/cleaned data/idnum_survival18_v13.dta")
-data_surtime <- data_surtime[, c(1, 3:5)]
-
-data <- data %>% left_join(data_surtime, by = "id")
-
-# bind hr
-data_hr <- hr08_18 %>%
-  bind_rows(hr11_18,hr14_18)
 # ------------------------------------------------------------------------------------- #
 ###################################### Clean Weight #################################
 # --------------------------------------------------------------------------------------#
@@ -104,19 +83,16 @@ wgt14_18 <- dat14_18 %>%
 hgt08_18 <- dat08_18 %>%
   mutate(height = g1021) %>%
   mutate(height = ifelse(height == 888 | height == 999, NA, height)) %>%
-  mutate_at(vars(height), funs(setattr(., "label", "directly measured height of the interviewee"))) %>%
   select(id, height)
 
 hgt11_18 <- dat11_18 %>%
   mutate(height = g1021) %>%
   mutate(height = ifelse(height == 888 | height == 999, NA, height)) %>%
-  mutate_at(vars(height), funs(setattr(., "label", "directly measured height of the interviewee"))) %>%
   select(id, height)
 
 hgt14_18 <- dat14_18 %>%
   mutate(height = g1021) %>%
   mutate(height = ifelse(height == 888 | height == 999, NA, height)) %>%
-  mutate_at(vars(height), funs(setattr(., "label", "directly measured height of the interviewee"))) %>%
   select(id, height)
 
 # ------------------------------------------------------------------------------------- #
@@ -126,7 +102,7 @@ hgt14_18 <- dat14_18 %>%
 # bind weight
 data_wgt <- wgt08_18 %>%
   bind_rows(wgt11_18,wgt14_18)
-  
+
 # ------------------------------------------------------------------------------------- #
 ###################################### Find Outliers for Weight #########################
 # --------------------------------------------------------------------------------------#
@@ -158,11 +134,11 @@ data_hgt <- hgt08_18 %>% bind_rows(hgt11_18,hgt14_18)
 outliers = boxplot(data_hgt$height, plot=FALSE)$out
 out_hgt <- data_hgt[data_hgt$height %in% outliers,]
 
-# drop abnormal values of height
+# drop abnormal values of height smaller than 100
 data_hgt <- data_hgt %>% mutate(height = ifelse(height < 100, NA, height)) %>% filter(is.na(height) == FALSE)
 
 
-# Boxplot of height
+# Boxplot of height 
 boxplot(data_hgt$height, main="boxplot of height", ylab="height",col=c("coral1"))
 
 
@@ -177,18 +153,12 @@ data_bmihr <-left_join(data_bmi,data_hr,by="id") %>%
 
 
 # ------------------------------------------------------------------------------------- #
-###################################### Full join dataset #####################################
-# --------------------------------------------------------------------------------------#
-data <- data_bmihr %>% full_join(data_bmihr, by = "id")
-
-
-# ------------------------------------------------------------------------------------- #
 ###################################### Clean Abnormal hr and bmi #####################################
 # --------------------------------------------------------------------------------------#
-## drop Obs with problematic heart rate
+## drop Obs with problematic heart rate larger than 200
 data_bmihr <- data_bmihr %>% mutate(bmihr = ifelse(hr >= 200, NA, bmihr)) %>% filter(is.na(bmihr) == FALSE)
 
-## drop Obs with problematic bmi
+## drop Obs with problematic bmi large than 60 or smaller than 10
 data_bmihr <- data_bmihr %>% mutate(bmihr = ifelse(bmi > 60, NA, bmihr)) %>% filter(is.na(bmihr) == FALSE)
 data_bmihr <- data_bmihr %>% mutate(bmihr = ifelse(bmi < 10, NA, bmihr)) %>% filter(is.na(bmihr) == FALSE)
 summary(data_bmihr$bmi)
@@ -197,20 +167,67 @@ summary(data_bmihr$bmi)
 # ------------------------------------------------------------------------------------- #
 ###################################### bmi*hr Quartile #####################################
 # --------------------------------------------------------------------------------------#
-## recode bmihr to quartile (the number Q1, Q2, Q3, Q4 is generated by zhengting's calculation)
+## recode bmihr to quartile 
 #Before doing that we need to have our own bmi and heartrate cleaned with problematic values cleared
 
 summary(data_bmihr$bmihr)
-data_bmihr <- data_bmihr %>% mutate(bmihr_quartile = case_when(bmihr <= 1236.3 ~ "Q1",
-                                                   1236.3 < bmihr & bmihr <= 1427.3 ~ "Q2",
-                                                   1427.3 < bmihr & bmihr <= 1655.6 ~ "Q3",
-                                                   bmihr > 1655.6 ~ "Q4")) %>%
+<<<<<<< HEAD
+data_bmihr <- data_bmihr %>% mutate(bmihr_quartile = case_when(bmihr <= 1294.2 ~ "Q1",
+                                                   1294.2 < bmihr & bmihr <= 1478.7 ~ "Q2",
+                                                   1478.7 < bmihr & bmihr <= 1698.2 ~ "Q3",
+                                                   bmihr > 1698.2 ~ "Q4")) %>%
 mutate(bmihr_quartile = factor(bmihr_quartile, levels = c("Q1", "Q2", "Q3", "Q4")))
+=======
+data_bmihr <- data_bmihr %>% mutate(bmihr_quartile = case_when(bmihr <= 1236.3 ~ "Q1",
+                                                               1236.3 < bmihr & bmihr <= 1427.3 ~ "Q2",
+                                                               1427.3 < bmihr & bmihr <= 1655.6 ~ "Q3",
+                                                               bmihr > 1655.6 ~ "Q4")) %>%
+  mutate(bmihr_quartile = factor(bmihr_quartile, levels = c("Q1", "Q2", "Q3", "Q4")))
+>>>>>>> e8df57e86f663f228befc64570f48e4ebdb4c1b9
 
 ## the value of Q1 Q2 Q3 is still suspended until we fix the stardard for excluding the problematic bmi value
 
 
-## Yuqing is currently at this step.
+
+# ------------------------------------------------------------------------------------- #
+###################################### Full join dataset #####################################
+# --------------------------------------------------------------------------------------#
+data <- data_bmihr %>% full_join(data_bmihr, by = "id")
+
+
+data_surtime <- read_dta("dat_survtime.dta")
+data_surtime <- data_surtime[, c(1, 3:5)]
+
+
+# ------------------------------------------------------------------------------------- #
+############################# Bind Other Data be Fitting Model #####################################
+# --------------------------------------------------------------------------------------#
+
+# merge with else data
+data <- readRDS("lifesty_ana18_non_repeated.rds")
+data <- data %>% full_join(data_bmihr, by = "id")
+data <- data %>% mutate(bmihr = bmi * hr) %>% filter(is.na(bmihr) == FALSE)
+
+# merge with survival time and status
+data_surtime <- read_dta("F:/Box Sync/Archives2020LLY/Zhengting/Duke Kunshan University Intern (zh133@duke.edu)/4 healthy aging-CLHLS/P06 Healthy lifestyle/formal analysis by ZH/cleaned data/idnum_survival18_v13.dta")
+data_surtime <- data_surtime[, c(1, 3:5)]
+
+
+
+
+data <- data %>% left_join(data_surtime, by = "id")
+
+# bind hr
+data_hr <- hr08_18 %>%
+  bind_rows(hr11_18,hr14_18)
+
+
+
+
+
+
+
+
 
 
 
@@ -318,8 +335,8 @@ write_dta(data, "F:/Box Sync/Archives2020LLY/Zhengting/clhls_bmi_hr_pilot.dta")
 
 
 
-
-
+########## Draw Survival Plot for Survbth ######### 
+data_surtime <- data_surtime[, c(1, 3:5)]
 
 
 
